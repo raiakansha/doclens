@@ -1,0 +1,65 @@
+
+#database configurations
+spring:
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5434}/${DB_NAME:doclens}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+      show-sql: true
+      properties:
+        hibernate:
+          format_sql: true
+
+  #Google Gemini configurations
+  ai:
+    model:
+      embedding:
+        text: google-genai
+
+    google:
+      genai:
+        api-key: ${GEMINI_API_KEY:demo-key}
+        chat:
+          options:
+            model: ${GEMINI_CHAT_MODEL:gemini-3.8-flash}
+            temperature: 0.2
+        embedding:
+          api-key: ${GEMINI_API_KEY}
+          text:
+            model: ${GEMINI_EMBEDDING_MODEL:gemini-embedding-001}
+            dimensions: 768
+
+    vectorstore:
+      pgvector:
+        index-type: HNSW
+        distance-type: COSINE_DISTANCE
+        dimensions: 768
+        table-name: vector_store
+        schema: public
+        initialize-schema: true
+
+  servlet:
+    multipart:
+      max-file-size: 25MB
+      max-request-size: 50MB
+
+#app configurations
+
+app:
+  rag:
+    chunk-size: 700
+#    chunk-overlap: 100
+    top-k: 5
+    similarity-threshold: 0.0
+
+  cors:
+    allowed-origins: "*"
+    allowed-method: GET,POST,PUT,DELETE,OPTIONS
+    allowed-headers: "*"
+
+
+
