@@ -7,9 +7,9 @@ import org.springframework.stereotype.Service;
 import java.util.UUID;
 
 @Getter
-@Service
+@Setter
+@NoArgsConstructor
 @AllArgsConstructor
-@RequiredArgsConstructor
 @Builder
 public class DocumentResponseDto {
 

@@ -83,7 +83,7 @@ public class DocumentIngestionService {
             vectorStore.add(enrichChunks);
 
             documentMetadata.setStatus(DocumentStatus.INDEXED);
-            documentMetadata.setTotalPages(enrichChunks.size());
+            documentMetadata.setTotalChunks(enrichChunks.size());
             documentMetadata.setErrorMessage(null);
             documentMetaDataRepository.save(documentMetadata);
             logger.info("Vector store written successfully");

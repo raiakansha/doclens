@@ -5,6 +5,7 @@ import com.project.doclens_backend.service.RagService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -38,7 +39,7 @@ public class ChatController {
         );
     }
 
-    @PostMapping("/stream")
+    @PostMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     @Operation(summary = "Stream real-time Q&A answer tokens via Server-sent Events(SSE)")
     public Flux<String> streamQuestion(@Valid @RequestBody ChatRequestDto chatRequestDto) {
         return ragService.streamQuestionAnswer(chatRequestDto);

@@ -90,15 +90,25 @@ public class DocumentMetaDatService {
     public List<DocumentResponseDto> getAllDocuments() {
         List<DocumentMetadata> allDocuments = documentMetaDataRepository.findAllByOrderByCreatedAtDesc();
         return allDocuments.stream()
-                .map(documentMetadata -> modelMapper.map(documentMetadata, DocumentResponseDto.class))
+                .map(this::mapToResponseDto)
                 .toList();
     }
 
     public DocumentResponseDto getDocumentById(UUID id) {
         DocumentMetadata documentMetadata = documentMetaDataRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Document with given id not found !!"));
-        return modelMapper.map(documentMetadata, DocumentResponseDto.class);
+        return mapToResponseDto(documentMetadata);
+    }
 
-
+    private DocumentResponseDto mapToResponseDto(DocumentMetadata doc) {
+        return DocumentResponseDto.builder()
+                .id(doc.getId())
+                .fileName(doc.getFilename())
+                .fileSize(doc.getFileSize())
+                .fileType(doc.getContentType())
+                .chunksCreated(doc.getTotalChunks() != null ? doc.getTotalChunks() : (doc.getTotalPages() != null ? doc.getTotalPages() : 0))
+                .status(doc.getStatus())
+                .message(doc.getErrorMessage())
+                .build();
     }
 
     @Transactional

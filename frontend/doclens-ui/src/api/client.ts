@@ -63,3 +63,111 @@ export const queryChat = (req: ChatRequest): Promise<ApiResponse<ChatResponse>> 
 
 export const searchSimilarity = (req: SearchRequest): Promise<ApiResponse<SearchResult>> =>
   api.post<ApiResponse<SearchResult>>('/chat/search/similarity', req).then((r) => r.data);
+
+export const streamChat = async (
+  req: ChatRequest,
+  onChunk: (token: string) => void,
+  signal?: AbortSignal
+): Promise<void> => {
+  const response = await fetch('/api/v1/chat/stream', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'text/event-stream, text/plain',
+    },
+    body: JSON.stringify(req),
+    signal,
+  });
+
+  if (!response.ok) {
+    let errorMsg = `Server error: ${response.status}`;
+    try {
+      const errJson = await response.json();
+      if (errJson?.message) errorMsg = errJson.message;
+    } catch {
+      // ignore
+    }
+    throw new Error(errorMsg);
+  }
+
+  const contentType = response.headers.get('content-type') || '';
+  if (contentType.includes('application/json')) {
+    const data = await response.json();
+    if (Array.isArray(data)) {
+      for (const item of data) {
+        if (typeof item === 'string' && item !== '[DONE]') {
+          onChunk(item);
+        }
+      }
+    } else if (data && typeof data === 'object') {
+      const text = (data as Record<string, unknown>).answer ??
+        ((data as Record<string, unknown>).data as Record<string, unknown>)?.answer ??
+        (data as Record<string, unknown>).message ?? '';
+      if (typeof text === 'string' && text) {
+        onChunk(text);
+      }
+    }
+    return;
+  }
+
+  if (!response.body) {
+    throw new Error('ReadableStream not supported by browser.');
+  }
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder('utf-8');
+  let buffer = '';
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split('\n');
+    buffer = lines.pop() || '';
+
+    for (const rawLine of lines) {
+      const trimmed = rawLine.trim();
+      if (!trimmed) continue;
+      if (trimmed.startsWith('data:')) {
+        let payload = trimmed.slice(5).trim();
+        if (payload === '[DONE]') {
+          return;
+        }
+        if ((payload.startsWith('"') && payload.endsWith('"')) || (payload.startsWith("'") && payload.endsWith("'"))) {
+          try {
+            payload = JSON.parse(payload);
+          } catch {
+            payload = payload.slice(1, -1);
+          }
+        }
+        if (payload) {
+          onChunk(payload);
+        }
+      } else if (trimmed === '[DONE]') {
+        return;
+      } else {
+        onChunk(rawLine);
+      }
+    }
+  }
+
+  if (buffer.trim()) {
+    const trimmed = buffer.trim();
+    if (trimmed.startsWith('data:')) {
+      let payload = trimmed.slice(5).trim();
+      if (payload !== '[DONE]' && payload) {
+        if ((payload.startsWith('"') && payload.endsWith('"')) || (payload.startsWith("'") && payload.endsWith("'"))) {
+          try {
+            payload = JSON.parse(payload);
+          } catch {
+            payload = payload.slice(1, -1);
+          }
+        }
+        onChunk(payload);
+      }
+    } else if (trimmed !== '[DONE]') {
+      onChunk(trimmed);
+    }
+  }
+};

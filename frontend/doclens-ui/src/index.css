@@ -2,8 +2,11 @@
 
 @layer base {
   :root {
-    --color-primary: 79 70 229;
-    --color-primary-dark: 67 56 202;
+    --bg-dark: #070a11;
+    --bg-sidebar: #0b0f19;
+    --bg-card: #121827;
+    --border-color: #1e2638;
+    --blue-primary: #0078ff;
   }
 
   * {
@@ -11,70 +14,179 @@
   }
 
   body {
-    @apply bg-gray-950 text-gray-100 antialiased;
+    background-color: #070a11;
+    color: #f1f5f9;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    overflow: hidden;
   }
 
   ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 5px;
+    height: 5px;
   }
   ::-webkit-scrollbar-track {
-    @apply bg-gray-900;
+    background: #0b0f19;
   }
   ::-webkit-scrollbar-thumb {
-    @apply bg-gray-600 rounded-full;
+    background: #1e293b;
+    border-radius: 9999px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-gray-500;
+    background: #334155;
   }
 }
 
 @layer utilities {
-  .glass {
-    background: rgba(255, 255, 255, 0.04);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+  .bg-app-dark {
+    background-color: #070a11;
   }
-
-  .glass-hover:hover {
-    background: rgba(255, 255, 255, 0.07);
-    border-color: rgba(255, 255, 255, 0.12);
+  .bg-sidebar-dark {
+    background-color: #0b0f19;
   }
-
-  .gradient-text {
-    background: linear-gradient(135deg, #818cf8, #c084fc);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+  .bg-card-dark {
+    background-color: #111726;
   }
-
-  .animate-shimmer {
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
-    background-size: 200% 100%;
-    animation: shimmer 1.5s infinite;
+  .bg-card-hover:hover {
+    background-color: #161e31;
   }
-}
-
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  .border-app {
+    border-color: #1b2437;
+  }
+  .text-muted {
+    color: #94a3b8;
+  }
+  .text-dim {
+    color: #64748b;
+  }
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
+  from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes slideIn {
-  from { opacity: 0; transform: translateX(-12px); }
-  to { opacity: 1; transform: translateX(0); }
-}
-
 .animate-fade-in {
-  animation: fadeIn 0.3s ease forwards;
+  animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.animate-slide-in {
-  animation: slideIn 0.25s ease forwards;
+/* ─── Light Mode Overrides ─────────────────────────────────────── */
+html.light,
+html.light body {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+html.light [class*="bg-[#070a11]"] {
+  background-color: #f8fafc !important;
+}
+
+html.light [class*="bg-[#0b0f19]"] {
+  background-color: #ffffff !important;
+}
+
+html.light [class*="bg-[#090d17]"] {
+  background-color: #f1f5f9 !important;
+}
+
+html.light [class*="bg-[#0e1422]"],
+html.light [class*="bg-[#0f1422]"],
+html.light [class*="bg-[#111726]"],
+html.light [class*="bg-[#121827]"],
+html.light [class*="bg-[#141b2d]"] {
+  background-color: #ffffff !important;
+}
+
+html.light [class*="bg-[#161e31]"],
+html.light [class*="bg-[#182035]"] {
+  background-color: #f1f5f9 !important;
+}
+
+html.light [class*="bg-[#161f33]"] {
+  background-color: #f1f5f9 !important;
+  color: #1d4ed8 !important;
+  border-color: #cbd5e1 !important;
+}
+
+html.light [class*="bg-[#090d16]"] {
+  background-color: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+
+html.light [class*="bg-[#1b253b]"] {
+  background-color: #e2e8f0 !important;
+}
+
+html.light [class*="border-[#1b2437]"],
+html.light [class*="border-[#1e2638]"],
+html.light [class*="border-[#1f2942]"],
+html.light [class*="border-[#242e47]"],
+html.light [class*="border-[#2d3a54]"] {
+  border-color: #e2e8f0 !important;
+}
+
+html.light [class*="text-white"],
+html.light [class*="text-slate-100"],
+html.light [class*="text-slate-200"] {
+  color: #0f172a !important;
+}
+
+html.light [class*="text-slate-300"] {
+  color: #334155 !important;
+}
+
+html.light [class*="text-slate-400"] {
+  color: #475569 !important;
+}
+
+html.light [class*="text-slate-500"] {
+  color: #64748b !important;
+}
+
+html.light [class*="bg-blue-600/15"],
+html.light [class*="bg-blue-500/10"] {
+  background-color: #eff6ff !important;
+}
+
+html.light [class*="border-blue-500/40"],
+html.light [class*="border-blue-500/20"] {
+  border-color: #bfdbfe !important;
+}
+
+html.light [class*="bg-blue-600"],
+html.light [class*="bg-[#0078ff]"] {
+  background-color: #2563eb !important;
+  color: #ffffff !important;
+}
+
+html.light [class*="bg-blue-600"] *,
+html.light [class*="bg-[#0078ff]"] * {
+  color: #ffffff !important;
+}
+
+html.light select,
+html.light option {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+}
+
+html.light textarea,
+html.light input {
+  color: #0f172a !important;
+}
+
+html.light textarea::placeholder,
+html.light input::placeholder {
+  color: #94a3b8 !important;
+}
+
+html.light ::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+html.light ::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+}
+
+html.light ::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
