@@ -40,4 +40,8 @@ public class DocumentMetadata {
 
     private LocalDateTime updatedAt;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
 }

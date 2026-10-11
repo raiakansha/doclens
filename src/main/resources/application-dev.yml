@@ -62,4 +62,10 @@ app:
     allowed-headers: "*"
 
 
+## jwt configurations
+jwt:
+  secret: ${JWT_SECRET:}
+  expiration: 3600000
+
+
 
