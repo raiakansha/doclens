@@ -2,12 +2,15 @@ package com.project.doclens_backend.controller;
 
 import com.project.doclens_backend.dto.ApiResponse;
 import com.project.doclens_backend.dto.DocumentResponseDto;
+import com.project.doclens_backend.entity.User;
 import com.project.doclens_backend.service.DocumentMetaDatService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,9 +30,10 @@ public class DocumentController {
             summary = "Upload and index a document(PDF, DOC, TEXT, MD, CSV)",
             description = "This api is used to upload and index the document file."
     )
-    public ResponseEntity<ApiResponse<DocumentResponseDto>> upload(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<ApiResponse<DocumentResponseDto>> upload(@RequestParam("file") MultipartFile file, Authentication authentication) {
 
-        DocumentResponseDto documentResponseDto = documentMetaDatService.uploadAndProcess(file);
+        User user = (User) authentication.getPrincipal();
+        DocumentResponseDto documentResponseDto = documentMetaDatService.uploadAndProcess(file, user);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.<DocumentResponseDto>builder()
@@ -46,8 +50,10 @@ public class DocumentController {
             summary = "Upload and index multiple documents simultaneously",
             description = "This api is used to upload and index multiple documents."
     )
-    public ResponseEntity<ApiResponse<List<DocumentResponseDto>>> uploadMutiple(@RequestParam("files") List<MultipartFile> files) {
-        List<DocumentResponseDto> response = documentMetaDatService.uploadMultipleDocuments(files);
+    public ResponseEntity<ApiResponse<List<DocumentResponseDto>>> uploadMutiple(@RequestParam("files") List<MultipartFile> files, Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
+
+        List<DocumentResponseDto> response = documentMetaDatService.uploadMultipleDocuments(files, user);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(
@@ -66,6 +72,24 @@ public class DocumentController {
     @Operation(summary = "List all uploaded documents and their indexing status")
     public ResponseEntity<ApiResponse<List<DocumentResponseDto>>> getAllDocuments(){
         List<DocumentResponseDto> documents =documentMetaDatService.getAllDocuments();
+        return ResponseEntity.ok(
+                ApiResponse.<List<DocumentResponseDto>>
+                                builder()
+                        .message("All documents is here")
+                        .success(true)
+                        .timestamp(LocalDateTime.now())
+                        .data(documents)
+                        .build()
+        );
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/user")
+    @Operation(summary = "List all uploaded documents og logged in user")
+    public ResponseEntity<ApiResponse<List<DocumentResponseDto>>> getAllDocumentsOfLogedInUser(Authentication authentication){
+        User user = (User) authentication.getPrincipal();
+
+        List<DocumentResponseDto> documents =documentMetaDatService.getAllDocumentByUser(user);
         return ResponseEntity.ok(
                 ApiResponse.<List<DocumentResponseDto>>
                                 builder()

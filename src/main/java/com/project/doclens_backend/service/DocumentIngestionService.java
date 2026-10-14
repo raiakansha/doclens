@@ -61,6 +61,7 @@ public class DocumentIngestionService {
                 enrichedMetadata.put("fileName", documentMetadata.getFilename());
                 enrichedMetadata.put("fileSize", documentMetadata.getFileSize());
                 enrichedMetadata.put("contentType", documentMetadata.getContentType());
+                enrichedMetadata.put("user_id", documentMetadata.getUser().getId().toString());
                 enrichedMetadata.put("chunkId", i);
 
                 //Preserve or calculate page number if available
